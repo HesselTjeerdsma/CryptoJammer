@@ -6,6 +6,7 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import status
+from django.shortcuts import render
 
 
 class ListInfectedPcView(generics.ListAPIView):
@@ -31,3 +32,6 @@ class ListInfectedPcView(generics.ListAPIView):
                 data="InfectedPC already existing",
                 status=status.HTTP_200_OK
             )
+def decrypt(request):
+    return render(request, 'index.html')
+
