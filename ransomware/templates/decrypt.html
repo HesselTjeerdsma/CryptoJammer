@@ -1,0 +1,6 @@
+<p>Enter your unique pc id here</p>
+<form action="/api/decrypt/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit">
+</form>
