@@ -1,5 +1,5 @@
 ﻿# CryptoJammer
-##Installation
+## Installation
 1. download and install python and pip
 2. RUN: pip install virtualenv
 3. RUN: virtualenv venv
