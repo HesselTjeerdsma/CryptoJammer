@@ -32,9 +32,9 @@ def inverse(A, M):
 def pair(s):
 	safe_prime = 0
 	while(True):
-		p = sympy.randprime(10^(s-1), (10^s)-1) #instead of getprime function from crypto
-                                                #Generates random prime with s bits
-		safe_prime = 2*p+1
+		p = sympy.randprime(10^(s-1), (10^s)-1) 
+		print(p)                                     
+		safe_prime = 2*(p+1)
 		if(sympy.isprime(safe_prime)):
 			break
 	while(True):
