@@ -14,7 +14,7 @@ Page for infected user to obtain decryption key
 #### /encrypt 
 Page for client software to do json http post in the following format
 ```javascript
-{ "uniqueID": "<put unique id here>" }
+{ "uniqueId": "<put unique id here>" }
 ```
 #### /admin
 A small admin interface. A account for this can be created by running ./manage.py createsuperuser
