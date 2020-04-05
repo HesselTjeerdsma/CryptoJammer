@@ -25,7 +25,7 @@ SECRET_KEY = 'j^r$7s+2hd^eaq-s8v*(fr9%aog-a_sy5c8uf8on0a=$kfw@jz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', 'cryptojammer.tjeerdsma.eu']
 
 
 # Application definition
