@@ -31,9 +31,7 @@ class ListInfectedPcView(generics.ListAPIView):
 def encrypt(request):
     if request.method == 'POST':
         if 'uniqueId' in request.data and 'hMac' in request.data:
-            now = datetime.now()
-            date = now.strftime('%Y-%m-%d')
-            messageServer = bytes(date, 'utf-8')
+            messageServer = bytes(request.data['uniqueId'], 'utf-8')
             secretKey = bytes("IyT87LzSAwq3kBwQ", 'utf-8')
             hmacServer  = hmac.new(secretKey, messageServer, hashlib.sha512).hexdigest()
             hmacClient = request.data['hMac']
