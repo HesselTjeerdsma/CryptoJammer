@@ -1,2 +1,8 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
 <h1>Thanks for supporting the CryptoJammer team! </h1>
 {{ privateKey|linebreaks}}
+<!-- Trigger -->
+<script>new ClipboardJS('.btn');</script>
+<button class="btn" data-clipboard-text="{{ privateKey }}">
+    Copy RSA to clipboard
+</button>
