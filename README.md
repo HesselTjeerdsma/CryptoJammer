@@ -1,4 +1,5 @@
-﻿# CryptoJammer
+# CryptoJammer
+A implementation of ransomware using AES+RSA as encryption algorithm. 
 ## Installation
 1. download and install python and pip
 2. RUN: pip install virtualenv
